@@ -1,0 +1,12 @@
+ID,Name,Age,Department,City,Salary,Experience,Gender
+101,Asif,30,IT,Warangal,65000,5,M
+102,Sara,28,HR,Hyderabad,55000,3,F
+103,Ali,35,Finance,Delhi,70000,8,M
+104,Priya,26,IT,Chennai,60000,2,F
+105,Rahul,31,Sales,Mumbai,50000,6,M
+106,Aisha,,HR,Hyderabad,52000,4,F
+107,John,29,IT,Bangalore,68000,5,M
+108,Meena,33,Finance,Delhi,72000,7,F
+109,Ravi,27,Sales,Pune,48000,2,M
+110,Sneha,30,IT,Warangal,65000,5,F
+111,Asif,30,IT,Warangal,65000,5,M
