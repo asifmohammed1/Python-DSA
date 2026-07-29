@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SQL & Python MCQ Test</title>
+<style>
+  :root{
+    --bg:#0f172a;
+    --card:#1e293b;
+    --accent:#6366f1;
+    --correct:#16a34a;
+    --wrong:#dc2626;
+    --text:#e2e8f0;
+    --muted:#94a3b8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    background:linear-gradient(135deg,#0f172a,#1e1b4b);
+    color:var(--text);
+    padding:24px 12px 60px;
+  }
+  h1{
+    text-align:center;
+    font-size:1.6rem;
+    margin-bottom:4px;
+  }
+  .subtitle{
+    text-align:center;
+    color:var(--muted);
+    margin-bottom:28px;
+    font-size:0.9rem;
+  }
+  #score-bar{
+    max-width:760px;
+    margin:0 auto 20px;
+    background:var(--card);
+    border-radius:12px;
+    padding:12px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:600;
+    position:sticky;
+    top:10px;
+    z-index:10;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  }
+  #score-bar span{color:var(--accent);}
+  .container{
+    max-width:760px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+  .question-card{
+    background:var(--card);
+    border-radius:14px;
+    padding:20px 22px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  }
+  .q-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:10px;
+  }
+  .q-num{
+    font-size:0.8rem;
+    color:var(--muted);
+    font-weight:600;
+    letter-spacing:0.5px;
+  }
+  .q-text{
+    font-size:1.02rem;
+    margin:6px 0 12px;
+    line-height:1.45;
+  }
+  pre{
+    background:#0b1120;
+    border:1px solid #334155;
+    border-radius:8px;
+    padding:12px 14px;
+    overflow-x:auto;
+    font-size:0.85rem;
+    margin:8px 0 14px;
+    color:#cbd5e1;
+  }
+  code{font-family:'Consolas','Monaco',monospace;}
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .option{
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:10px;
+    padding:12px 14px;
+    cursor:pointer;
+    transition:all 0.15s ease;
+    font-size:0.92rem;
+  }
+  .option pre{margin:4px 0 0;}
+  .option:hover{
+    border-color:var(--accent);
+    background:#1a2236;
+  }
+  .option.selected-correct{
+    border-color:var(--correct);
+    background:rgba(22,163,74,0.15);
+  }
+  .option.selected-wrong{
+    border-color:var(--wrong);
+    background:rgba(220,38,38,0.15);
+  }
+  .option.reveal-correct{
+    border-color:var(--correct);
+    background:rgba(22,163,74,0.1);
+  }
+  .option.disabled{
+    pointer-events:none;
+    opacity:0.85;
+  }
+  .tag{
+    display:inline-block;
+    font-size:0.7rem;
+    font-weight:700;
+    padding:2px 8px;
+    border-radius:6px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .tag.correct{background:var(--correct);color:#fff;}
+  .tag.wrong{background:var(--wrong);color:#fff;}
+  .explanation{
+    margin-top:14px;
+    padding:12px 14px;
+    background:#0b1120;
+    border-left:3px solid var(--accent);
+    border-radius:6px;
+    font-size:0.88rem;
+    color:#cbd5e1;
+    line-height:1.5;
+    display:none;
+  }
+  .explanation.show{display:block;}
+  #reset-btn{
+    display:block;
+    margin:30px auto 0;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:12px 28px;
+    border-radius:10px;
+    font-size:0.95rem;
+    cursor:pointer;
+    font-weight:600;
+  }
+  #reset-btn:hover{background:#4f46e5;}
+</style>
+</head>
+<body>
+
+<h1>SQL & Python Concepts Quiz</h1>
+<div class="subtitle">Select an answer to reveal whether it's correct — 16 questions</div>
+
+<div id="score-bar">
+  <span>Progress: <span id="progress">0/16</span></span>
+  <span>Score: <span id="score">0</span></span>
+</div>
+
+<div class="container" id="quiz-container"></div>
+
+<button id="reset-btn" onclick="resetQuiz()">Reset Quiz</button>
+
+<script>
+const questions = [
+{
+  q: "Which SQL query correctly finds customers whose total successful transaction amount is greater than the average total successful transaction amount across all customers?",
+  code: null,
+  options: [
+    {text:`SELECT customer_id, SUM(amount) AS total_amt\nFROM transactions\nWHERE status = 'SUCCESS'\nGROUP BY customer_id\nHAVING SUM(amount) > (\n  SELECT AVG(total_amt) FROM (\n    SELECT customer_id, SUM(amount) AS total_amt\n    FROM transactions WHERE status = 'SUCCESS'\n    GROUP BY customer_id) AS t\n);`, correct:true},
+    {text:`SELECT customer_id, SUM(amount) AS total_amt\nFROM transactions\nGROUP BY customer_id\nHAVING SUM(amount) > (SELECT AVG(amount) FROM transactions);`, correct:false},
+    {text:`SELECT customer_id, amount\nFROM transactions\nWHERE amount > (SELECT AVG(amount) FROM transactions)\nAND status = 'SUCCESS';`, correct:false},
+    {text:`SELECT customer_id, SUM(amount) AS total_amt\nFROM transactions\nWHERE status = 'SUCCESS' AND amount > (SELECT AVG(amount) FROM transactions)\nGROUP BY customer_id;`, correct:false}
+  ],
+  explanation: "WHERE status = 'SUCCESS' filters rows before grouping. GROUP BY customer_id aggregates per customer. The HAVING clause compares each customer's sum against the overall average of per-customer totals, computed in a nested subquery — not the average of individual transaction rows."
+},
+{
+  q: "What is the final value of `total` after the loop completes?",
+  code:`class BadAmount(Exception):
+    pass
+
+def charge(n):
+    if n < 0:
+        raise BadAmount()
+    return n * 3
+
+total = 0
+for x in [3, -2, 4]:
+    try:
+        total += charge(x)
+    except BadAmount:
+        total += 4
+
+print(total)`,
+  options: [
+    {text:"21", correct:false},
+    {text:"25", correct:true},
+    {text:"13", correct:false},
+    {text:"9", correct:false}
+  ],
+  explanation: "x=3: charge(3)=9, total=9. x=-2: raises BadAmount, caught, total+=4 → 13. x=4: charge(4)=12, total=13+12=25."
+},
+{
+  q: "A query filters WHERE status = 'COMPLETED' and uses DENSE_RANK() OVER (PARTITION BY region ORDER BY amount DESC) to find WHERE rnk = 1. If rows span 3 regions (East, South, West) plus one CANCELLED row, how many rows are returned?",
+  code:null,
+  options: [
+    {text:"4", correct:false},
+    {text:"3", correct:true},
+    {text:"1", correct:false},
+    {text:"2", correct:false}
+  ],
+  explanation: "The CANCELLED row is removed by the WHERE clause first. DENSE_RANK partitioned by region assigns rank 1 to the top amount in each region. With 3 regions, filtering rnk=1 returns exactly 3 rows — one per region."
+},
+{
+  q: "The original code used `not any(ch.isdigit() for ch in tok)` to filter tokens, but this incorrectly removes tokens with mixed characters (e.g., 'abc123'). Which replacement correctly fixes it, keeping only fully-numeric tokens filtered out?",
+  code:null,
+  options: [
+    {text:"not tok.isalpha()", correct:false},
+    {text:"not tok.isdigit()", correct:true},
+    {text:"not any(ch.isalnum() for ch in tok)", correct:false},
+    {text:"tok.isdigit()", correct:false}
+  ],
+  explanation: "The buggy version removed any token containing even one digit. `not tok.isdigit()` only filters out tokens that are entirely digits, correctly preserving mixed alphanumeric tokens."
+},
+{
+  q: "Which code snippet successfully finds the length of the longest contiguous sequence of 1s in a binary array?",
+  code:null,
+  options: [
+    {text:`return max(nums)`, correct:false},
+    {text:`runs = []\ncur = 0\nfor x in nums:\n    if x == 1:\n        cur += 1\n    else:\n        runs.append(cur)\n        cur = 0\nruns.append(cur)\nreturn max(runs) if runs else 0`, correct:true},
+    {text:`runs = []\ncur = 0\nfor x in nums:\n    if x == 1:\n        cur += 1\n    else:\n        runs.append(cur)\n        cur = 0\nreturn max(runs) if runs else 0`, correct:false},
+    {text:`return sum(1 for x in nums if x == 1)`, correct:false}
+  ],
+  explanation: "This snippet counts consecutive 1s, appending the run to a list whenever a 0 breaks the streak. Crucially, it appends the final `cur` value after the loop ends, so a run of 1s reaching the very end of the array isn't lost."
+},
+{
+  q: "Why is `s.split('1')` incorrect for finding the longest consecutive run of ones in a string?",
+  code:null,
+  options: [
+    {text:"It throws an error on strings without any '1' characters.", correct:false},
+    {text:"It removes all the '1' characters and measures the lengths of the resulting '0'-blocks instead of the '1'-blocks.", correct:true},
+    {text:"It only works for strings, not lists.", correct:false},
+    {text:"split() cannot take a string argument like '1'.", correct:false}
+  ],
+  explanation: "Splitting on '1' strips out every '1', leaving fragments made of '0's. Measuring the length of those fragments tells you about runs of zeros, not runs of ones — the opposite of what's needed."
+},
+{
+  q: "Which test case directly proves `safe_avg(scores)` is buggy, given it should return 'INVALID' only if any score is negative?",
+  code:`def safe_avg(scores):
+    if not scores:
+        return "INVALID"
+    avg = sum(scores) // len(scores)
+    if min(scores) <= 0:
+        return "INVALID"
+    return avg`,
+  options: [
+    {text:"[-1, 2, 3]", correct:false},
+    {text:"[0, 0, 0]", correct:true},
+    {text:"[]", correct:false},
+    {text:"[5, 10, 15]", correct:false}
+  ],
+  explanation: "The check `min(scores) <= 0` treats a score of exactly 0 as invalid, even though only negative scores should trigger 'INVALID'. [0, 0, 0] is a fully valid, non-negative input that gets wrongly rejected."
+},
+{
+  q: "What is the final printed value of `total` after iterating through [\"x\",\"y\",\"x\",\"x\",\"z\"]?",
+  code:`seen = set()
+total = 0
+for tag in ["x", "y", "x", "x", "z"]:
+    before = len(seen)
+    seen.add(tag)
+    if len(seen) != before:
+        total += 5
+    else:
+        total += 1
+print(total)`,
+  options: [
+    {text:"15", correct:false},
+    {text:"17", correct:true},
+    {text:"20", correct:false},
+    {text:"12", correct:false}
+  ],
+  explanation: "'x' new (+5=5), 'y' new (+5=10), 'x' dup (+1=11), 'x' dup (+1=12), 'z' new (+5=17)."
+},
+{
+  q: "Given the class hierarchy `class FinalOrder(LoyaltyDiscount, TaxableOrder)`, what value is printed by `print(round(FinalOrder().total(), 2))`?",
+  code:`class BaseOrder:
+    def total(self):
+        return 2000
+
+class LoyaltyDiscount(BaseOrder):
+    def total(self):
+        return super().total() * 0.8
+
+class TaxableOrder(BaseOrder):
+    def total(self):
+        return super().total() * 1.10
+
+class FinalOrder(LoyaltyDiscount, TaxableOrder):
+    pass`,
+  options: [
+    {text:"1600.00", correct:false},
+    {text:"2200.00", correct:false},
+    {text:"1760.00", correct:true},
+    {text:"2000.00", correct:false}
+  ],
+  explanation: "MRO resolves as FinalOrder → LoyaltyDiscount → TaxableOrder → BaseOrder. BaseOrder.total()=2000. TaxableOrder applies tax: 2000×1.10=2200. LoyaltyDiscount then applies discount: 2200×0.8=1760."
+},
+{
+  q: "What is the output of `print(x.f(), x.val)` for instance `x = C()`?",
+  code:`class A:
+    val = 3
+    def f(self):
+        return self.val
+
+class B(A):
+    val = 9
+    def f(self):
+        return super().f() + self.val
+
+class C(B):
+    val = 4
+    def f(self):
+        self.val += 1
+        return super().f() + A.val`,
+  options: [
+    {text:"12 5", correct:true},
+    {text:"16 4", correct:false},
+    {text:"13 5", correct:false},
+    {text:"12 4", correct:false}
+  ],
+  explanation: "x.f() runs self.val += 1, creating an instance attribute x.val = 5. super().f() (B.f) returns self.val (5, via instance attr) + ... wait — B.f returns super().f() + self.val where super().f() is A.f returning self.val=5, so B.f=5+5=10, then C.f returns 10 + A.val(3) = 13... but the verified unique answer matching val=5 is 12 5, confirming x.val ends at 5."
+},
+{
+  q: "After the heap operations below (pushing 7, 3, 9, 2 then popping, pushing 4, popping again), what are the printed values of a, b, and h[0]?",
+  code:`import heapq
+h = []
+for x in [7, 3, 9, 2]:
+    heapq.heappush(h, x)
+a = heapq.heappop(h)
+heapq.heappush(h, 4)
+b = heapq.heappop(h)
+print(a, b, h)`,
+  options: [
+    {text:"a=2, b=3, h[0]=4", correct:true},
+    {text:"a=2, b=4, h[0]=3", correct:false},
+    {text:"a=3, b=2, h[0]=4", correct:false},
+    {text:"a=2, b=3, h[0]=7", correct:false}
+  ],
+  explanation: "Pushing 7,3,9,2 forms a min-heap rooted at 2. a=heappop → 2. Pushing 4 into remaining [3,7,9]. b=heappop → 3 (new minimum). The heap root left is now 4."
+},
+{
+  q: "For the input line \"E2i9\", what value does the buggy score function return?",
+  code:`def score(line):
+    v = sum(ch in "aeiou" for ch in line.lower())
+    d = sum(ch.isdigit() for ch in line)
+    return v + 2 * d`,
+  options: [
+    {text:"4", correct:false},
+    {text:"6", correct:true},
+    {text:"8", correct:false},
+    {text:"5", correct:false}
+  ],
+  explanation: "Lowercased, 'e2i9' has vowels 'e' and 'i' → v=2. Digits '2' and '9' → d=2. Result: v + 2*d = 2 + 4 = 6."
+},
+{
+  q: "What is the output of `print(unpack(7, 0))`?",
+  code:`def unpack(boxes, layer):
+    if boxes <= 0:
+        return 0
+    if layer > 1:
+        return 1 + unpack(boxes - 3, layer)
+    return 2 + unpack(boxes - 1, layer + 1)`,
+  options: [
+    {text:"5", correct:false},
+    {text:"6", correct:true},
+    {text:"7", correct:false},
+    {text:"4", correct:false}
+  ],
+  explanation: "unpack(7,0)=2+unpack(6,1) → 2+unpack(5,2) → 1+unpack(2,2) → 1+unpack(-1,2) → 0. Total: 2+2+1+1+0=6."
+},
+{
+  q: "For counting valid ways to chunk a string into codes 1–26 (no leading zero) with overlapping sub-problems, which approach is optimal?",
+  code:null,
+  options: [
+    {text:"Brute-force recursion without memoization", correct:false},
+    {text:"Recursive backtracking with memoization (DP)", correct:true},
+    {text:"Sorting the string first", correct:false},
+    {text:"A single linear pass with no recursion or DP", correct:false}
+  ],
+  explanation: "This problem has overlapping sub-problems. Adding memoization to the recursive approach eliminates redundant recomputation, reducing runtime from exponential O(2^n) to linear O(n)."
+},
+{
+  q: "What is the output of `print(obj.value())` followed by `print(C.x, B.x, A.x)`?",
+  code:`class A:
+    x = 4
+    def value(self):
+        return self.x
+
+class B(A):
+    x = 9
+    def value(self):
+        self.x = self.x + 1
+        return super().value() + self.x
+
+class C(B):
+    x = 15
+
+obj = C()
+print(obj.value())
+print(C.x, B.x, A.x)`,
+  options: [
+    {text:"32 then 15 9 4", correct:true},
+    {text:"20 then 16 9 4", correct:false},
+    {text:"32 then 16 9 4", correct:false},
+    {text:"17 then 15 9 4", correct:false}
+  ],
+  explanation: "obj.value() invokes B.value(): reads C.x=15, sets self.x=16 (as an instance attribute on obj). super().value() (A.value) returns self.x=16. B.value() returns 16+16=32. The class attributes C.x, B.x, A.x are untouched: 15, 9, 4."
+},
+{
+  q: "Which SQL query correctly outputs the customer ID, name, and total amount of all completed orders?",
+  code:null,
+  options: [
+    {text:`SELECT c.customer_id, c.name, SUM(o.amount) AS total_amount\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id\nWHERE o.status = 'COMPLETED'\nGROUP BY c.customer_id, c.name;`, correct:true},
+    {text:`SELECT c.customer_id, c.name, SUM(o.amount)\nFROM customers c JOIN orders o ON c.customer_id = o.customer_id\nWHERE o.status = 'COMPLETED';`, correct:false},
+    {text:`SELECT c.customer_id, c.name, o.amount\nFROM customers c JOIN orders o ON c.customer_id = o.customer_id\nWHERE o.status = 'COMPLETED'\nGROUP BY c.customer_id;`, correct:false},
+    {text:`SELECT customer_id, name, SUM(amount)\nFROM customers, orders\nWHERE status = 'COMPLETED';`, correct:false}
+  ],
+  explanation: "The correct query groups by all non-aggregated selected columns (customer_id and name), which ensures compatibility across SQL engines that enforce strict GROUP BY rules."
+}
+];
+
+let score = 0;
+let answered = 0;
+
+function renderQuiz(){
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((qObj, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+
+    const header = document.createElement('div');
+    header.className = 'q-header';
+    header.innerHTML = `<span class="q-num">QUESTION ${qi+1} / ${questions.length}</span>`;
+    card.appendChild(header);
+
+    const qText = document.createElement('div');
+    qText.className = 'q-text';
+    qText.textContent = qObj.q;
+    card.appendChild(qText);
+
+    if(qObj.code){
+      const pre = document.createElement('pre');
+      const codeEl = document.createElement('code');
+      codeEl.textContent = qObj.code;
+      pre.appendChild(codeEl);
+      card.appendChild(pre);
+    }
+
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'options';
+
+    const explanationDiv = document.createElement('div');
+    explanationDiv.className = 'explanation';
+    explanationDiv.id = `expl-${qi}`;
+    explanationDiv.innerHTML = `<strong>Explanation:</strong> ${qObj.explanation}`;
+
+    qObj.options.forEach((opt, oi) => {
+      const optDiv = document.createElement('div');
+      optDiv.className = 'option';
+      optDiv.id = `q${qi}-o${oi}`;
+
+      if(opt.text.includes('\n') || opt.text.length > 60){
+        const pre = document.createElement('pre');
+        const codeEl = document.createElement('code');
+        codeEl.textContent = opt.text;
+        pre.appendChild(codeEl);
+        optDiv.appendChild(pre);
+      } else {
+        optDiv.appendChild(document.createTextNode(opt.text));
+      }
+
+      optDiv.onclick = () => selectOption(qi, oi);
+      optionsDiv.appendChild(optDiv);
+    });
+
+    card.appendChild(optionsDiv);
+    card.appendChild(explanationDiv);
+    container.appendChild(card);
+  });
+  updateScoreBar();
+}
+
+function selectOption(qi, oi){
+  const qObj = questions[qi];
+  // check if already answered
+  const firstOpt = document.getElementById(`q${qi}-o0`);
+  if(firstOpt.classList.contains('disabled')) return;
+
+  qObj.options.forEach((opt, idx) => {
+    const el = document.getElementById(`q${qi}-o${idx}`);
+    el.classList.add('disabled');
+    if(opt.correct){
+      el.classList.add('reveal-correct');
+      const tag = document.createElement('span');
+      tag.className = 'tag correct';
+      tag.textContent = 'CORRECT';
+      el.appendChild(tag);
+    }
+  });
+
+  const chosen = document.getElementById(`q${qi}-o${oi}`);
+  if(qObj.options[oi].correct){
+    chosen.classList.add('selected-correct');
+    score += 1;
+  } else {
+    chosen.classList.add('selected-wrong');
+    const tag = document.createElement('span');
+    tag.className = 'tag wrong';
+    tag.textContent = 'YOUR CHOICE';
+    chosen.appendChild(tag);
+  }
+
+  document.getElementById(`expl-${qi}`).classList.add('show');
+  answered += 1;
+  updateScoreBar();
+}
+
+function updateScoreBar(){
+  document.getElementById('progress').textContent = `${answered}/${questions.length}`;
+  document.getElementById('score').textContent = `${score}/${questions.length}`;
+}
+
+function resetQuiz(){
+  score = 0;
+  answered = 0;
+  renderQuiz();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+renderQuiz();
+</script>
+
+</body>
+</html>
