@@ -1,0 +1,136 @@
+
+SQL Data Analysis – Practice Questions
+
+-- STEP 1 : Restore Database (Run only if needed)
+
+-- Rename employee_details back to employees
+ALTER TABLE employee_details
+RENAME TO employees;
+
+-- STEP 2 : Recreate Projects Table
+
+CREATE TABLE projects (
+project_id INT PRIMARY KEY,
+project_name VARCHAR(100),
+budget DECIMAL(12,2),
+emp_id INT,
+FOREIGN KEY (emp_id) REFERENCES employees(emp_id));
+
+-- STEP 3 : Insert Projects Data
+
+INSERT INTO projects
+VALUES
+(201,'Website Development',200000,101),
+(202,'Payroll System',150000,102),
+(203,'Banking Software',300000,103),
+(204,'Marketing Campaign',120000,104),
+(205,'Finance Dashboard',250000,105);
+
+-- Question 1 : Total Employees
+
+SELECT COUNT(*) AS total_employees
+FROM employees;
+
+-- Question 2 : Average Salary
+
+SELECT AVG(salary) AS average_salary
+FROM employees;
+
+-- Question 3 : Highest Paid Employee
+
+SELECT *
+FROM employees
+ORDER BY salary DESC
+LIMIT 1;
+
+
+-- Question 4 : Department-wise Employee Count
+
+SELECT
+d.dept_name,
+COUNT(e.emp_id) AS total_employees
+FROM departments d
+LEFT JOIN employees e
+ON d.dept_id = e.dept_id
+GROUP BY d.dept_name;
+
+
+-- Question 5 : Department-wise Average Salary
+
+SELECT
+d.dept_name,
+AVG(e.salary) AS average_salary
+FROM departments d
+JOIN employees e
+ON d.dept_id = e.dept_id
+GROUP BY d.dept_name;
+
+
+-- Question 6 : Employees Without Projects
+
+SELECT
+e.emp_name
+FROM employees e
+LEFT JOIN projects p
+ON e.emp_id = p.emp_id
+WHERE p.project_id IS NULL;
+
+-- Question 7 : Total Project Budget by Department
+
+SELECT
+d.dept_name,
+SUM(p.budget) AS total_project_budget
+FROM departments d
+JOIN employees e
+ON d.dept_id = e.dept_id
+JOIN projects p
+ON e.emp_id = p.emp_id
+GROUP BY d.dept_name;
+
+
+-- Question 8 : Top 3 Highest Paid Employees
+
+SELECT
+emp_name,
+salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 3;
+
+-- Question 9 : Employees Joined After 01-Jan-2023
+
+SELECT
+emp_name,
+joining_date
+FROM employees
+WHERE joining_date > '2023-01-01';
+
+
+-- Question 10 : Employee Report
+
+SELECT
+e.emp_name,
+d.dept_name,
+p.project_name,
+e.salary
+FROM employees e
+JOIN departments d
+ON e.dept_id = d.dept_id
+LEFT JOIN projects p
+ON e.emp_id = p.emp_id;
+
+
+-- BONUS CHALLENGE
+
+SELECT
+d.dept_name,
+COUNT(e.emp_id) AS total_employees,
+AVG(e.salary) AS average_salary,
+MAX(e.salary) AS highest_salary,
+MIN(e.salary) AS lowest_salary,
+SUM(e.salary) AS total_salary_paid
+FROM departments d
+LEFT JOIN employees e
+ON d.dept_id = e.dept_id
+GROUP BY d.dept_name
+ORDER BY average_salary DESC;
