@@ -38,3 +38,14 @@
 	38.	Implement a Simple Queue
 	39.	Check if Two Strings are Rotations of Each Other
 	40.	Find Largest and Smallest in One Pass
+
+	41.	Find Union of Two Sets
+	42.	Check Subset Using Sets
+	43.	Find Maximum Element in Tuple
+	44.	Swap Values Using Tuple Unpacking
+	45.	Count Frequency of Words in a Sentence
+	46.	Merge Two Dictionaries
+	47.	Find Key with Maximum Value in Dict
+	48.	Invert a Dictionary (Swap Keys and Values)
+	49.	Check if Two Dictionaries are Equal
+	50.	Sort a Dictionary by Value
